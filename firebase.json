@@ -6,6 +6,9 @@
   "database": {
     "rules": "database.rules.json"
   },
+  "storage": {
+    "rules": "storage.rules"
+  },
   "emulators": {
     "firestore": {
       "port": 8080,
@@ -24,6 +27,13 @@
       "host": "0.0.0.0",
       "enabled": true
     },
-    "singleProjectMode": true
+    "singleProjectMode": true,
+    "storage": {
+      "port": 9199,
+      "host": "0.0.0.0"
+    }
+  },
+  "scripts": {
+    "postinstall": "npm run seed"
   }
 }

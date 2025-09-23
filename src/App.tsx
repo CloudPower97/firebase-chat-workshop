@@ -4,12 +4,8 @@ import { v4 as uuidv4 } from 'uuid';
 import UserPromptDialog from './components/UserPromptDialog';
 import { AppContext } from './context/AppContext';
 import Home from './pages/Home';
+import type { User } from './types/user'; // Importa l'interfaccia User come type
 import { getMyUser, setMyUser } from './utils/storage';
-
-interface User {
-  id: string;
-  name: string;
-}
 
 function App() {
   const [me, setMeState] = useState<User | null>(null);
@@ -24,8 +20,8 @@ function App() {
     }
   }, []);
 
-  const handleUserPromptSubmit = (name: string) => {
-    const newUser: User = { id: uuidv4(), name };
+  const handleUserPromptSubmit = (name: string, surname: string) => { // Aggiungi surname
+    const newUser: User = { id: uuidv4(), name, surname }; // Includi surname
     setMyUser(newUser);
     setMeState(newUser);
     setOpenUserPrompt(false);
@@ -40,13 +36,19 @@ function App() {
   return (
     <AppContext.Provider value={appContextValue}>
       <CssBaseline />
+
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
         <Home onUserChangeRequest={handleUserChangeRequest} />
       </Box>
+
       <UserPromptDialog
-        open={openUserPrompt || !me} // Open if explicitly requested or no user is set
+        open={openUserPrompt}
         onSubmit={handleUserPromptSubmit}
-        onClose={() => setOpenUserPrompt(false)} // Allow closing if a user is already set
+        onClose={() => {
+          if (me) {
+            setOpenUserPrompt(false);
+          }
+        }}
       />
     </AppContext.Provider>
   );

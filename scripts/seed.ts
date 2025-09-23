@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase-admin/app';
 import { getDatabase } from 'firebase-admin/database';
 import { getFirestore } from 'firebase-admin/firestore';
 import { v4 as uuidv4 } from 'uuid';
+import { User } from '../src/types/user.js'; // Importa l'interfaccia User (con estensione .js per Node.js ESM)
 
 // Use Firebase Admin SDK with emulators
 process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080';
@@ -59,6 +60,37 @@ async function seedFirestore() {
   console.log('Firestore seeded with 3 messages.');
 }
 
+async function seedUsers() {
+  console.log('Seeding Users collection...');
+  const usersRef = dbFs.collection('users');
+
+  const existingUsers = await usersRef.limit(1).get();
+  if (!existingUsers.empty) {
+    console.log('Users collection already has data. Skipping seed.');
+    return;
+  }
+
+  const users: User[] = [
+    {
+      id: uuidv4(),
+      name: 'Mario',
+      surname: 'Rossi',
+      avatar: 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=200&d=mp', // Esempio di avatar
+    },
+    {
+      id: uuidv4(),
+      name: 'Luigi',
+      surname: 'Verdi',
+      avatar: 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=200&d=retro', // Esempio di avatar
+    },
+  ];
+
+  for (const user of users) {
+    await usersRef.doc(user.id).set(user);
+  }
+  console.log('Users collection seeded with 2 example users.');
+}
+
 async function seedRealtimeDatabase() {
   console.log('Seeding Realtime Database...');
   const messagesRef = dbRtdb.ref(`rooms/${ROOM_ID}/messages`);
@@ -105,6 +137,7 @@ async function seedRealtimeDatabase() {
 async function main() {
   try {
     await seedFirestore();
+    await seedUsers(); // Aggiungi il seeding degli utenti
     await seedRealtimeDatabase();
     console.log('Seeding complete!');
   } catch (error) {

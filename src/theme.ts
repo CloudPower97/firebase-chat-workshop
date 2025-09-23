@@ -20,8 +20,14 @@ const theme = createTheme({
           color: 'white',
           '&.Mui-selected': {
             color: 'white', // Ensure selected tab text is also white
-            borderBottom: '2px solid white', // Add a white underline for the active tab
           },
+        },
+      },
+    },
+    MuiTabs: {
+      styleOverrides: {
+        indicator: {
+          backgroundColor: 'white',
         },
       },
     },

@@ -1,9 +1,5 @@
 import { createContext } from 'react';
-
-interface User {
-  id: string;
-  name: string;
-}
+import type { User } from '../types/user'; // Importa l'interfaccia User
 
 interface AppContextType {
   me: User | null;

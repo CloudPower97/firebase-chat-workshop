@@ -11,16 +11,17 @@ import { useState } from 'react';
 
 interface UserPromptDialogProps {
   open: boolean;
-  onSubmit: (name: string) => void;
+  onSubmit: (name: string, surname: string) => void; // Modifica la firma di onSubmit
   onClose: () => void;
 }
 
 function UserPromptDialog({ open, onSubmit, onClose }: UserPromptDialogProps) {
   const [name, setName] = useState('');
+  const [surname, setSurname] = useState('');
 
   const handleSubmit = () => {
-    if (name.trim()) {
-      onSubmit(name.trim());
+    if (name.trim() && surname.trim()) {
+      onSubmit(name.trim(), surname.trim());
     }
   };
 
@@ -33,13 +34,14 @@ function UserPromptDialog({ open, onSubmit, onClose }: UserPromptDialogProps) {
       <DialogTitle>Enter Your Name</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Please enter a display name for the chat workshop. This will be stored locally.
+          Please enter your name and surname for the chat workshop. This will be stored locally.
         </DialogContentText>
+
         <TextField
           autoFocus
           margin="dense"
           id="name"
-          label="Display Name"
+          label="Name"
           type="text"
           fullWidth
           variant="standard"
@@ -50,10 +52,28 @@ function UserPromptDialog({ open, onSubmit, onClose }: UserPromptDialogProps) {
               handleSubmit();
             }
           }}
+          sx={{ mb: 2 }}
+        />
+
+        <TextField
+          margin="dense"
+          id="surname"
+          label="Surname"
+          type="text"
+          fullWidth
+          variant="standard"
+          value={surname}
+          onChange={(e) => setSurname(e.target.value)}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+              handleSubmit();
+            }
+          }}
         />
       </DialogContent>
+
       <DialogActions>
-        <Button onClick={handleSubmit} disabled={!name.trim()}>
+        <Button onClick={handleSubmit} disabled={!name.trim() || !surname.trim()}>
           Start Chat
         </Button>
       </DialogActions>

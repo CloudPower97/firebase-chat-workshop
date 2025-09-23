@@ -1,9 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-
-interface User {
-  id: string;
-  name: string;
-}
+import type { User } from '../types/user'; // Import the User interface
 
 const USER_STORAGE_KEY = 'firebase-chat-workshop-user';
 

@@ -1,8 +1,9 @@
-import { AppBar, Box, Button, Tab, Tabs, Typography } from '@mui/material';
+import { AppBar, Box, Button, Menu, MenuItem, Avatar as MuiAvatar, Tab, Tabs, Typography } from '@mui/material';
 import { useContext, useState } from 'react';
-import PresencePanel from '../components/PresencePanel';
-import { AppContext } from '../context/AppContext';
 import Chat from '../components/Chat';
+import PresencePanel from '../components/PresencePanel';
+import UploadAvatarDialog from '../components/UploadAvatarDialog'; // Importa il nuovo componente
+import { AppContext } from '../context/AppContext';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -43,6 +44,10 @@ interface HomeProps {
 
 function Home({ onUserChangeRequest }: HomeProps) {
   const [value, setValue] = useState(0);
+  const [openAvatarDialog, setOpenAvatarDialog] = useState(false); // Stato per la dialog dell'avatar
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null); // Stato per il menu dropdown
+  const openMenu = Boolean(anchorEl);
+
   const appContext = useContext(AppContext);
 
   if (!appContext) {
@@ -51,7 +56,7 @@ function Home({ onUserChangeRequest }: HomeProps) {
 
   const { me } = appContext;
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
@@ -62,20 +67,56 @@ function Home({ onUserChangeRequest }: HomeProps) {
           <Typography variant="h6" component="div">
             Firebase Chat Workshop
           </Typography>
+
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Typography variant="body2" sx={{ mr: 2 }}>
-              {me?.name} ({me?.id.substring(0, 8)}...)
-            </Typography>
-            <Button color="inherit" onClick={onUserChangeRequest}>
-              Change name
-            </Button>
+            {me && (
+              <>
+                <MuiAvatar
+                  alt={`${me.name} ${me.surname}`}
+                  src={me.avatar || undefined}
+                  onClick={(event) => setAnchorEl(event.currentTarget)}
+                  sx={{ cursor: 'pointer', mr: 1 }}
+                />
+
+                <Menu
+                  anchorEl={anchorEl}
+                  open={openMenu}
+                  onClose={() => setAnchorEl(null)}
+                  MenuListProps={{
+                    'aria-labelledby': 'basic-button',
+                  }}
+                >
+                  <MenuItem onClick={() => {
+                    setOpenAvatarDialog(true);
+                    setAnchorEl(null);
+                  }}>
+                    Modifica Avatar
+                  </MenuItem>
+
+                  <MenuItem onClick={() => {
+                    onUserChangeRequest();
+                    setAnchorEl(null);
+                  }}>
+                    Cambia Nome
+                  </MenuItem>
+                </Menu>
+              </>
+            )}
+
+            {!me && (
+              <Button color="inherit" onClick={onUserChangeRequest}>
+                Imposta Nome
+              </Button>
+            )}
           </Box>
         </Box>
+
         <Tabs value={value} onChange={handleChange} aria-label="chat tabs" variant="fullWidth">
           <Tab label="Feed" {...a11yProps(0)} />
           <Tab label="Chat" {...a11yProps(1)} />
         </Tabs>
       </AppBar>
+
       <Box sx={{ display: 'flex', flexGrow: 1 }}>
         <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
           <TabPanel value={value} index={0}>
@@ -92,6 +133,19 @@ function Home({ onUserChangeRequest }: HomeProps) {
           <PresencePanel />
         </Box>
       </Box>
+      {me && (
+        <UploadAvatarDialog
+          open={openAvatarDialog}
+          onClose={() => setOpenAvatarDialog(false)}
+          userId={me.id}
+          currentAvatarUrl={me.avatar}
+          onAvatarUploaded={(newAvatarUrl) => {
+            if (appContext.setMe) {
+              appContext.setMe({ ...me, avatar: newAvatarUrl });
+            }
+          }}
+        />
+      )}
     </Box>
   );
 }
