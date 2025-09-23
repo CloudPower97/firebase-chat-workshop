@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /rooms/{roomId}/messages/{messageId} {
+      // Allow read access to anyone for workshop simplicity
+      allow read: if true;
+
+      // Allow create if no auth (for workshop simplified user identity) OR if auth, senderId matches client's uid,
+      // text is string, not empty, max 1000 chars, and createdAt is server timestamp
+      allow create: if (request.auth == null || request.resource.data.senderId == request.auth.uid) &&
+                       request.resource.data.text is string &&
+                       request.resource.data.text.size() > 0 &&
+                       request.resource.data.text.size() <= 1000 &&
+                       request.resource.data.createdAt == request.time;
+    }
+  }
+}

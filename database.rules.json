@@ -1,0 +1,23 @@
+{
+  "rules": {
+    "rooms": {
+      "$roomId": {
+        "messages": {
+          ".indexOn": [
+            "createdAt"
+          ],
+          "$messageId": {
+            ".read": true,
+            ".write": "auth != null && newData.child('senderId').val() == auth.uid && newData.child('text').isString() && newData.child('text').val().length > 0 && newData.child('text').val().length <= 1000 && newData.child('createdAt').val() == now"
+          }
+        }
+      }
+    },
+    "status": {
+      "$userId": {
+        ".write": "auth != null && $userId == auth.uid",
+        ".read": true
+      }
+    }
+  }
+}
