@@ -5,13 +5,41 @@ service cloud.firestore {
       // Allow read access to anyone for workshop simplicity
       allow read: if true;
 
-      // Allow create if no auth (for workshop simplified user identity) OR if auth, senderId matches client's uid,
-      // text is string, not empty, max 1000 chars, and createdAt is server timestamp
-      allow create: if (request.auth == null || request.resource.data.senderId == request.auth.uid) &&
-                       request.resource.data.text is string &&
-                       request.resource.data.text.size() > 0 &&
-                       request.resource.data.text.size() <= 1000 &&
-                       request.resource.data.createdAt == request.time;
+      // Allow create with more robust validation
+      allow create: if isValidMessage();
+    }
+
+    // Helper function to validate message creation
+    function isValidMessage() {
+      let data = request.resource.data;
+
+      return (
+        // Check if required fields exist
+        data.keys().hasAll(['text', 'senderId', 'senderName', 'createdAt']) &&
+
+        // Validate text field
+        'text' in data &&
+        data.text is string &&
+        data.text.size() > 0 &&
+        data.text.size() <= 1000 &&
+
+        // Validate senderId field
+        'senderId' in data &&
+        data.senderId is string &&
+        data.senderId.size() > 0 &&
+
+        // Validate senderName field
+        'senderName' in data &&
+        data.senderName is string &&
+        data.senderName.size() > 0 &&
+
+        // Validate createdAt (either server timestamp or valid timestamp)
+        'createdAt' in data &&
+        (data.createdAt == request.time || data.createdAt is timestamp) &&
+
+        // Auth validation: if authenticated, senderId should match uid
+        (request.auth == null || data.senderId == request.auth.uid)
+      );
     }
   }
 }

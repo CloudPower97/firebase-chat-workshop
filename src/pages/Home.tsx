@@ -1,9 +1,8 @@
 import { AppBar, Box, Button, Tab, Tabs, Typography } from '@mui/material';
 import { useContext, useState } from 'react';
-import FirestoreChat from '../components/FirestoreChat';
 import PresencePanel from '../components/PresencePanel';
-import RtdbChat from '../components/RtdbChat';
 import { AppContext } from '../context/AppContext';
+import Chat from '../components/Chat';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -73,17 +72,20 @@ function Home({ onUserChangeRequest }: HomeProps) {
           </Box>
         </Box>
         <Tabs value={value} onChange={handleChange} aria-label="chat tabs" variant="fullWidth">
-          <Tab label="Firestore Chat" {...a11yProps(0)} />
-          <Tab label="Realtime DB Chat" {...a11yProps(1)} />
+          <Tab label="Feed" {...a11yProps(0)} />
+          <Tab label="Chat" {...a11yProps(1)} />
         </Tabs>
       </AppBar>
       <Box sx={{ display: 'flex', flexGrow: 1 }}>
         <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
           <TabPanel value={value} index={0}>
-            <FirestoreChat />
+            {/* Feed */}
+            <Typography variant="h6" gutterBottom>
+              Firestore Feed
+            </Typography>
           </TabPanel>
           <TabPanel value={value} index={1}>
-            <RtdbChat />
+            <Chat />
           </TabPanel>
         </Box>
         <Box sx={{ width: 300, borderLeft: '1px solid #eee', p: 2 }}>

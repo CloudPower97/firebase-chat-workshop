@@ -18,7 +18,7 @@ import { formatTimestamp } from '../utils/time';
 
 const ROOM_ID = 'general';
 
-function RtdbChat() {
+function Chat() {
   const [messages, setMessages] = useState<RtdbMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const appContext = useContext(AppContext);
@@ -146,4 +146,4 @@ function RtdbChat() {
   );
 }
 
-export default RtdbChat;
+export default Chat;
