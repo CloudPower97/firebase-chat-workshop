@@ -37,22 +37,17 @@ function App() {
 
   const appContextValue = useMemo(() => ({ me, setMe: setMyUser }), [me]);
 
-  if (!me) {
-    return (
-      <UserPromptDialog
-        open={openUserPrompt}
-        onSubmit={handleUserPromptSubmit}
-        onClose={() => {}}
-      />
-    );
-  }
-
   return (
     <AppContext.Provider value={appContextValue}>
       <CssBaseline />
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
         <Home onUserChangeRequest={handleUserChangeRequest} />
       </Box>
+      <UserPromptDialog
+        open={openUserPrompt || !me} // Open if explicitly requested or no user is set
+        onSubmit={handleUserPromptSubmit}
+        onClose={() => setOpenUserPrompt(false)} // Allow closing if a user is already set
+      />
     </AppContext.Provider>
   );
 }
