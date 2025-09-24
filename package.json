@@ -9,6 +9,9 @@
     "dev:emulated": "concurrently \"npm run emulators\" \"npm run dev\"",
     "seed": "ts-node --project tsconfig.node.json scripts/seed.ts",
     "build": "tsc -b && vite build",
+    "build:functions": "cd functions && npm run build",
+    "deploy:functions": "cd functions && npm run deploy",
+    "functions:serve": "cd functions && npm run serve",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,css,json}\""
@@ -18,6 +21,7 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.2",
     "@mui/material": "^7.3.2",
+    "date-fns": "^4.1.0",
     "dayjs": "^1.11.18",
     "firebase": "^12.3.0",
     "firebase-admin": "^13.5.0",

@@ -34,7 +34,7 @@ function UserPromptDialog({ open, onSubmit, onClose }: UserPromptDialogProps) {
       <DialogTitle>Enter Your Name</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Please enter your name and surname for the chat workshop. This will be stored locally.
+          Please enter your name and surname. This information will be visible to other users.
         </DialogContentText>
 
         <TextField
