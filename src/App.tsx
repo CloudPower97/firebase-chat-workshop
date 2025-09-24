@@ -1,27 +1,65 @@
 import { Box, CssBaseline } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import UserPromptDialog from './components/UserPromptDialog';
 import { AppContext } from './context/AppContext';
 import Home from './pages/Home';
-import type { User } from './types/user'; // Importa l'interfaccia User come type
+import Auth from './pages/Auth';
+import type { User } from './types/user';
 import { getMyUser, setMyUser } from './utils/storage';
+import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth';
+import { auth, db } from './firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 function App() {
   const [me, setMeState] = useState<User | null>(null);
   const [openUserPrompt, setOpenUserPrompt] = useState(false);
+  const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = getMyUser();
-    if (storedUser) {
-      setMeState(storedUser);
-    } else {
-      setOpenUserPrompt(true);
-    }
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setFirebaseUser(user);
+      if (user) {
+        // Cerca l'utente in localStorage
+        const storedUser = getMyUser(user.uid);
+
+        if (storedUser) {
+          setMeState(storedUser);
+        } else {
+          // Se non è in localStorage, cercalo in Firestore
+          const userDocRef = doc(db, 'users', user.uid);
+          const userDocSnap = await getDoc(userDocRef);
+
+          if (userDocSnap.exists()) {
+            const userData = userDocSnap.data() as User;
+            setMyUser(userData); // Salva in localStorage
+            setMeState(userData);
+          } else {
+            // L'utente è nuovo, apri il dialogo per chiedere nome e cognome
+            setOpenUserPrompt(true);
+          }
+        }
+      } else {
+        setMeState(null);
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const handleUserPromptSubmit = (name: string, surname: string) => { // Aggiungi surname
-    const newUser: User = { id: uuidv4(), name, surname }; // Includi surname
+  const handleUserPromptSubmit = async (name: string, surname: string) => {
+    if (!firebaseUser) return;
+
+    const newUser: User = {
+      id: firebaseUser.uid,
+      name,
+      surname,
+      email: firebaseUser.email || '',
+    };
+
+    // Salva il nuovo utente in Firestore e in localStorage
+    await setDoc(doc(db, 'users', firebaseUser.uid), newUser);
     setMyUser(newUser);
     setMeState(newUser);
     setOpenUserPrompt(false);
@@ -33,23 +71,33 @@ function App() {
 
   const appContextValue = useMemo(() => ({ me, setMe: setMyUser }), [me]);
 
+  if (loading) {
+    return <div>Loading...</div>; // O un componente di caricamento più carino
+  }
+
   return (
     <AppContext.Provider value={appContextValue}>
       <CssBaseline />
+      {firebaseUser ? (
+        <>
+          <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+            <Home onUserChangeRequest={handleUserChangeRequest} />
+          </Box>
 
-      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-        <Home onUserChangeRequest={handleUserChangeRequest} />
-      </Box>
-
-      <UserPromptDialog
-        open={openUserPrompt}
-        onSubmit={handleUserPromptSubmit}
-        onClose={() => {
-          if (me) {
-            setOpenUserPrompt(false);
-          }
-        }}
-      />
+          <UserPromptDialog
+            open={openUserPrompt}
+            onSubmit={handleUserPromptSubmit}
+            onClose={() => {
+              // Non chiudere il dialogo se l'utente non ha ancora inserito i dati
+              if (me) {
+                setOpenUserPrompt(false);
+              }
+            }}
+          />
+        </>
+      ) : (
+        <Auth />
+      )}
     </AppContext.Provider>
   );
 }
