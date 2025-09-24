@@ -1,6 +1,8 @@
 import { AppBar, Box, Button, Menu, MenuItem, Avatar as MuiAvatar, Tab, Tabs, Typography } from '@mui/material';
 import { useContext, useState } from 'react';
 import Chat from '../components/Chat';
+import CreatePost from '../components/CreatePost';
+import Feed from '../components/Feed';
 import PresencePanel from '../components/PresencePanel';
 import UploadAvatarDialog from '../components/UploadAvatarDialog'; // Importa il nuovo componente
 import { AppContext } from '../context/AppContext';
@@ -72,7 +74,7 @@ function Home({ onUserChangeRequest }: HomeProps) {
             {me && (
               <>
                 <MuiAvatar
-                  alt={`${me.name} ${me.surname}`}
+                  alt={`${me.displayName} ${me.surname}`}
                   src={me.avatar || undefined}
                   onClick={(event) => setAnchorEl(event.currentTarget)}
                   sx={{ cursor: 'pointer', mr: 1 }}
@@ -120,10 +122,8 @@ function Home({ onUserChangeRequest }: HomeProps) {
       <Box sx={{ display: 'flex', flexGrow: 1 }}>
         <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
           <TabPanel value={value} index={0}>
-            {/* Feed */}
-            <Typography variant="h6" gutterBottom>
-              Firestore Feed
-            </Typography>
+            <CreatePost />
+            <Feed />
           </TabPanel>
           <TabPanel value={value} index={1}>
             <Chat />
@@ -137,7 +137,7 @@ function Home({ onUserChangeRequest }: HomeProps) {
         <UploadAvatarDialog
           open={openAvatarDialog}
           onClose={() => setOpenAvatarDialog(false)}
-          userId={me.id}
+          userEmail={me.email}
           currentAvatarUrl={me.avatar}
           onAvatarUploaded={(newAvatarUrl) => {
             if (appContext.setMe) {

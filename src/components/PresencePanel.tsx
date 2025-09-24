@@ -20,8 +20,8 @@ function PresencePanel() {
     // Set up presence
     onValue(isConnectedRef, (snapshot) => {
       if (snapshot.val() === true) {
-        onDisconnect(userStatusRef).set({ online: false, at: serverTimestamp(), name: me.name });
-        set(userStatusRef, { online: true, at: serverTimestamp(), name: me.name });
+        onDisconnect(userStatusRef).set({ online: false, at: serverTimestamp(), name: me.displayName });
+        set(userStatusRef, { online: true, at: serverTimestamp(), name: me.displayName });
       }
     });
 

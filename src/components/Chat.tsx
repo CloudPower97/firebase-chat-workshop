@@ -61,7 +61,7 @@ function Chat() {
       await push(ref(dbRtdb, `rooms/${ROOM_ID}/messages`), {
         text: newMessage,
         senderId: appContext.me.id,
-        senderName: appContext.me.name,
+        senderName: appContext.me.displayName,
         createdAt: serverTimestampRtdb(),
       });
       setNewMessage('');

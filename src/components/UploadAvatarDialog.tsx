@@ -10,10 +10,10 @@ import {
   IconButton,
   Avatar as MuiAvatar,
 } from '@mui/material';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { useRef, useState } from 'react';
-import { dbFs, storage } from '../firebase'; // Importa le istanze centralizzate
+import { storage, db as dbFs } from '../firebase'; // Importa le istanze centralizzate
 
 // Usa le istanze centralizzate di Firebase
 const db = dbFs;
@@ -21,7 +21,7 @@ const db = dbFs;
 interface UploadAvatarDialogProps {
   open: boolean;
   onClose: () => void;
-  userId: string;
+  userEmail: string;
   currentAvatarUrl?: string;
   onAvatarUploaded: (newAvatarUrl: string) => void;
 }
@@ -29,12 +29,14 @@ interface UploadAvatarDialogProps {
 function UploadAvatarDialog({
   open,
   onClose,
-  userId,
+  userEmail,
   currentAvatarUrl,
   onAvatarUploaded,
 }: UploadAvatarDialogProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | undefined>(currentAvatarUrl);
+  const [previewUrl, setPreviewUrl] = useState<string | undefined>(
+    currentAvatarUrl
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,21 +64,31 @@ function UploadAvatarDialog({
     setError(null);
 
     try {
-      const storageRef = ref(storage, `avatars/${userId}/${selectedFile.name}`);
+      const storageRef = ref(
+        storage,
+        `avatars/${userEmail}/${selectedFile.name}`
+      );
       const snapshot = await uploadBytes(storageRef, selectedFile);
       const downloadURL = await getDownloadURL(snapshot.ref);
 
       // Aggiorna il documento dell'utente in Firestore
-      const userRef = doc(db, 'users', userId);
-      await updateDoc(userRef, {
-        avatar: downloadURL,
-      });
+      const userRef = doc(db, 'users', userEmail);
+      await setDoc(
+        userRef,
+        {
+          avatar: downloadURL,
+        },
+        { merge: true }
+      );
 
       onAvatarUploaded(downloadURL);
       onClose();
     } catch (err) {
-      console.error('Errore durante l\'upload o l\'aggiornamento dell\'avatar:', err);
-      setError('Errore durante il caricamento dell\'avatar. Riprova.');
+      console.error(
+        "Errore durante l'upload o l'aggiornamento dell'avatar:",
+        err
+      );
+      setError("Errore durante il caricamento dell'avatar. Riprova.");
     } finally {
       setUploading(false);
     }
