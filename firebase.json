@@ -9,7 +9,15 @@
   "storage": {
     "rules": "storage.rules"
   },
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs20"
+  },
   "emulators": {
+    "functions": {
+      "port": 5001,
+      "host": "0.0.0.0"
+    },
     "firestore": {
       "port": 8080,
       "host": "0.0.0.0"
@@ -23,7 +31,7 @@
       "host": "0.0.0.0"
     },
     "ui": {
-      "port": 4000,
+      "port": 4001,
       "host": "0.0.0.0",
       "enabled": true
     },

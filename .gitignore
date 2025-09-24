@@ -23,3 +23,7 @@ yarn-debug.log*
 yarn-error.log*
 firestore-debug.log
 database-debug.log
+
+# Firebase Functions
+functions/node_modules
+functions/lib

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "emulators": "firebase emulators:start --only firestore,database,auth,ui,storage",
+    "emulators": "firebase emulators:start --only firestore,database,auth,ui,storage,functions",
     "dev:emulated": "concurrently \"npm run emulators\" \"npm run dev\"",
     "seed": "ts-node --project tsconfig.node.json scripts/seed.ts",
     "build": "tsc -b && vite build",
