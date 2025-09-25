@@ -6,4 +6,5 @@ export interface Post {
   author: User;
   text: string;
   createdAt: Timestamp;
+  ownerId: string;
 }

@@ -1,9 +1,9 @@
-import { Box, CssBaseline } from '@mui/material';
+import { Alert, Box, CssBaseline, Snackbar } from '@mui/material';
 import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useEffect, useMemo, useState } from 'react';
 import UserPromptDialog from './components/UserPromptDialog';
-import { AppContext } from './context/AppContext';
+import { AppContext, type SnackbarSeverity } from './context/AppContext';
 import { auth, db } from './firebase';
 import Auth from './pages/Auth';
 import Home from './pages/Home';
@@ -15,6 +15,15 @@ function App() {
   const [openUserPrompt, setOpenUserPrompt] = useState(false);
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: SnackbarSeverity;
+  }>({
+    open: false,
+    message: '',
+    severity: 'info',
+  });
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -32,7 +41,7 @@ function App() {
 
           if (userDocSnap.exists()) {
             const userData = userDocSnap.data() as User;
-            setMyUser(userData); // Salva in localStorage
+            setMyUser({...userData, id: user.uid}); // Salva in localStorage
             setMeState(userData);
           } else {
             // L'utente è nuovo, apri il dialogo per chiedere nome e cognome
@@ -70,7 +79,24 @@ function App() {
     setOpenUserPrompt(true);
   };
 
-  const appContextValue = useMemo(() => ({ me, setMe: setMyUser }), [me]);
+  const showSnackbar = (message: string, severity: SnackbarSeverity) => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const handleCloseSnackbar = (
+    _event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  };
+
+  const appContextValue = useMemo(
+    () => ({ me, setMe: setMyUser, showSnackbar }),
+    [me]
+  );
 
   if (loading) {
     return <div>Loading...</div>; // O un componente di caricamento più carino
@@ -99,6 +125,20 @@ function App() {
       ) : (
         <Auth />
       )}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </AppContext.Provider>
   );
 }

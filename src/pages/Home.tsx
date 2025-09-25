@@ -133,6 +133,9 @@ function Home({ onUserChangeRequest }: HomeProps) {
           <PresencePanel />
         </Box>
       </Box>
+      <Typography variant="body2" color="textSecondary" align="center" sx={{ p: 2 }}>
+        {me?.id ? `Logged in as: ${me.name} ${me.surname} (${me.email}) ${me.id}` : 'Not logged in'}
+      </Typography>
       {me && (
         <UploadAvatarDialog
           open={openAvatarDialog}

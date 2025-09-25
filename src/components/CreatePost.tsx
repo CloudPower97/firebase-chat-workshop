@@ -23,8 +23,9 @@ function CreatePost() {
           email: appContext.me.email,
           name: appContext.me.name,
           surname: appContext.me.surname,
-          avatar: appContext.me.avatar,
+          avatar: appContext.me.avatar ?? null,
         },
+        ownerId: appContext.me.id,
         text: text,
         createdAt: serverTimestamp(),
       });
