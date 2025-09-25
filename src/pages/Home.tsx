@@ -1,4 +1,5 @@
 import { AppBar, Box, Button, Menu, MenuItem, Avatar as MuiAvatar, Tab, Tabs, Typography } from '@mui/material';
+import { signOut } from 'firebase/auth';
 import { useContext, useState } from 'react';
 import Chat from '../components/Chat';
 import CreatePost from '../components/CreatePost';
@@ -6,6 +7,7 @@ import Feed from '../components/Feed';
 import PresencePanel from '../components/PresencePanel';
 import UploadAvatarDialog from '../components/UploadAvatarDialog'; // Importa il nuovo componente
 import { AppContext } from '../context/AppContext';
+import { auth } from '../firebase';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -62,6 +64,11 @@ function Home({ onUserChangeRequest }: HomeProps) {
     setValue(newValue);
   };
 
+  const handleSignOut = () => {
+    signOut(auth);
+    setAnchorEl(null);
+  };
+
   return (
     <Box sx={{ flexGrow: 1, bgcolor: 'background.paper', display: 'flex', flexDirection: 'column' }}>
       <AppBar position="static">
@@ -100,6 +107,9 @@ function Home({ onUserChangeRequest }: HomeProps) {
                     setAnchorEl(null);
                   }}>
                     Cambia Nome
+                  </MenuItem>
+                  <MenuItem onClick={handleSignOut}>
+                    Logout
                   </MenuItem>
                 </Menu>
               </>
@@ -142,7 +152,7 @@ function Home({ onUserChangeRequest }: HomeProps) {
           onClose={() => setOpenAvatarDialog(false)}
           userId={me.id}
           currentAvatarUrl={me.avatar}
-          onAvatarUploaded={(newAvatarUrl) => {
+          onAvatarUploaded={(newAvatarUrl: string) => {
             if (appContext.setMe) {
               appContext.setMe({ ...me, avatar: newAvatarUrl });
             }
