@@ -7,7 +7,7 @@
     "rules": "database.rules.json"
   },
   "storage": {
-    "rules": "storage.rules"
+    "rules": "storage/storage.rules"
   },
   "functions": [
     {
@@ -45,10 +45,6 @@
       "port": 4001,
       "host": "0.0.0.0",
       "enabled": true
-    },
-    "functions": {
-      "host": "localhost",
-      "port": 5001
     },
     "singleProjectMode": true,
     "storage": {
