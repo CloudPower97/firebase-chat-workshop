@@ -6,11 +6,11 @@ import {
   CardHeader,
   Typography,
 } from "@mui/material";
+import { formatDistanceToNow } from "date-fns";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../firebase";
 import type { Post } from "../types/post";
-import { formatDistanceToNow } from "date-fns";
 
 function Feed() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -41,11 +41,11 @@ function Feed() {
           <CardHeader
             avatar={
               <Avatar
-                alt={`${post.author.displayName} ${post.author.surname}`}
+                alt={`${post.author.name} ${post.author.surname}`}
                 src={post.author.avatar || undefined}
               />
             }
-            title={`${post.author.displayName} ${post.author.surname}`}
+            title={`${post.author.name} ${post.author.surname}`}
             subheader={
               post.createdAt
                 ? formatDistanceToNow(post.createdAt.toDate(), {

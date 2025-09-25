@@ -11,7 +11,7 @@ import { useState } from 'react';
 
 interface UserPromptDialogProps {
   open: boolean;
-  onSubmit: (name: string, surname: string) => void; // Modifica la firma di onSubmit
+  onSubmit: (name: string, surname: string) => void;
   onClose: () => void;
 }
 

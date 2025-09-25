@@ -13,7 +13,7 @@ import {
 import { doc, setDoc } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { useRef, useState } from 'react';
-import { storage, db as dbFs } from '../firebase'; // Importa le istanze centralizzate
+import { db as dbFs, storage } from '../firebase'; // Importa le istanze centralizzate
 
 // Usa le istanze centralizzate di Firebase
 const db = dbFs;
@@ -21,7 +21,7 @@ const db = dbFs;
 interface UploadAvatarDialogProps {
   open: boolean;
   onClose: () => void;
-  userEmail: string;
+  userId: string;
   currentAvatarUrl?: string;
   onAvatarUploaded: (newAvatarUrl: string) => void;
 }
@@ -29,7 +29,7 @@ interface UploadAvatarDialogProps {
 function UploadAvatarDialog({
   open,
   onClose,
-  userEmail,
+  userId,
   currentAvatarUrl,
   onAvatarUploaded,
 }: UploadAvatarDialogProps) {
@@ -66,13 +66,13 @@ function UploadAvatarDialog({
     try {
       const storageRef = ref(
         storage,
-        `avatars/${userEmail}/${selectedFile.name}`
+        `avatars/${userId}/${selectedFile.name}`
       );
       const snapshot = await uploadBytes(storageRef, selectedFile);
       const downloadURL = await getDownloadURL(snapshot.ref);
 
       // Aggiorna il documento dell'utente in Firestore
-      const userRef = doc(db, 'users', userEmail);
+      const userRef = doc(db, 'users', userId);
       await setDoc(
         userRef,
         {

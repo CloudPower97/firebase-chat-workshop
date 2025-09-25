@@ -11,12 +11,14 @@ export const helloWorld = functions.https.onRequest((request, response) => {
 
 export const createUserOnFirestore = functions.auth.user().onCreate((user) => {
   const email = user.email;
-  const displayName = user.displayName || "Anonymous";
+  const name = user.displayName?.split(' ')[0] || "Anonymous";
+  const surname = user.displayName?.split(' ').slice(1).join(' ') || "";
   const uid = user.uid;
 
   const userDoc = {
     email,
-    displayName,
+    name,
+    surname,
     createdAt: new Date().toISOString(),
   };
 

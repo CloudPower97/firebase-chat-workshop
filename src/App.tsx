@@ -1,14 +1,14 @@
 import { Box, CssBaseline } from '@mui/material';
+import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useEffect, useMemo, useState } from 'react';
 import UserPromptDialog from './components/UserPromptDialog';
 import { AppContext } from './context/AppContext';
-import Home from './pages/Home';
+import { auth, db } from './firebase';
 import Auth from './pages/Auth';
+import Home from './pages/Home';
 import type { User } from './types/user';
 import { getMyUser, setMyUser } from './utils/storage';
-import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth';
-import { auth, db } from './firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 function App() {
   const [me, setMeState] = useState<User | null>(null);
@@ -56,6 +56,7 @@ function App() {
       name,
       surname,
       email: firebaseUser.email || '',
+      avatar: firebaseUser.photoURL || undefined, // Popola l'avatar se disponibile
     };
 
     // Salva il nuovo utente in Firestore e in localStorage

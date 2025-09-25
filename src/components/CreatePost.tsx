@@ -1,7 +1,7 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useContext, useState } from "react";
 import { AppContext } from "../context/AppContext";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase";
 
 function CreatePost() {
@@ -21,7 +21,8 @@ function CreatePost() {
       await addDoc(collection(db, "posts"), {
         author: {
           email: appContext.me.email,
-          displayName: appContext.me.displayName,
+          name: appContext.me.name,
+          surname: appContext.me.surname,
           avatar: appContext.me.avatar,
         },
         text: text,

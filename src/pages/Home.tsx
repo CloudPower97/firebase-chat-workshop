@@ -74,7 +74,7 @@ function Home({ onUserChangeRequest }: HomeProps) {
             {me && (
               <>
                 <MuiAvatar
-                  alt={`${me.displayName} ${me.surname}`}
+                  alt={`${me.name} ${me.surname}`}
                   src={me.avatar || undefined}
                   onClick={(event) => setAnchorEl(event.currentTarget)}
                   sx={{ cursor: 'pointer', mr: 1 }}
@@ -137,7 +137,7 @@ function Home({ onUserChangeRequest }: HomeProps) {
         <UploadAvatarDialog
           open={openAvatarDialog}
           onClose={() => setOpenAvatarDialog(false)}
-          userEmail={me.email}
+          userId={me.id}
           currentAvatarUrl={me.avatar}
           onAvatarUploaded={(newAvatarUrl) => {
             if (appContext.setMe) {
