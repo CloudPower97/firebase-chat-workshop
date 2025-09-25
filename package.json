@@ -15,7 +15,9 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,css,json}\"",
-    "test:storage": "vitest storage/test"
+    "test:storage": "vitest storage/test",
+    "test:firestore": "vitest test/firestore.spec.ts",
+    "postinstall": "cd functions && npm install && npm run build"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
