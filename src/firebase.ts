@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { connectAuthEmulator, getAuth } from 'firebase/auth';
 import { connectDatabaseEmulator, getDatabase, serverTimestamp as rtdbServerTimestamp } from 'firebase/database';
 import { connectFirestoreEmulator, getFirestore, serverTimestamp as fsServerTimestamp } from 'firebase/firestore';
+import { connectFunctionsEmulator, getFunctions } from 'firebase/functions';
 import { connectStorageEmulator, getStorage } from 'firebase/storage';
 
 export const firebaseConfig = {
@@ -19,6 +20,7 @@ export const db = getFirestore(app);
 export const dbRtdb = getDatabase(app);
 export const auth = getAuth(app);
 export const storage = getStorage(app);
+export const functions = getFunctions(app);
 
 export const serverTimestampFs = fsServerTimestamp;
 export const serverTimestampRtdb = rtdbServerTimestamp;
@@ -29,5 +31,6 @@ if (location.hostname === 'localhost') {
   connectDatabaseEmulator(dbRtdb, 'localhost', 9000);
   connectAuthEmulator(auth, 'http://localhost:9099');
   connectStorageEmulator(storage, 'localhost', 9199);
+  connectFunctionsEmulator(functions, 'localhost', 5001);
   console.log('Connected to Firebase Emulators!');
 }
