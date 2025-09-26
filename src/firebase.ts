@@ -5,6 +5,7 @@ import { connectFirestoreEmulator, getFirestore, serverTimestamp as fsServerTime
 import { connectFunctionsEmulator, getFunctions } from 'firebase/functions';
 import { connectStorageEmulator, getStorage } from 'firebase/storage';
 import { getMessaging } from 'firebase/messaging';
+import { getRemoteConfig } from 'firebase/remote-config';
 
 export const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -25,6 +26,7 @@ export const auth = getAuth(app);
 export const storage = getStorage(app);
 export const functions = getFunctions(app);
 export const messaging = getMessaging(app);
+export const remoteConfig = getRemoteConfig(app);
 
 export const serverTimestampFs = fsServerTimestamp;
 export const serverTimestampRtdb = rtdbServerTimestamp;
