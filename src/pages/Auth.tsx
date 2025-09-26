@@ -17,6 +17,8 @@ const Auth: React.FC = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+
+
   const handleAuthAction = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);

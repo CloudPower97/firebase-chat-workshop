@@ -11,8 +11,8 @@ process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
 
 // Initialize Firebase Admin SDK (no actual credentials needed for emulators)
 initializeApp({
-  projectId: 'demo-chat', // Must match .firebaserc default project
-  databaseURL: 'http://localhost:9000?ns=demo-chat', // Use emulator host
+  projectId: 'fir-corso-9430d', // Must match .firebaserc default project
+  databaseURL: 'http://localhost:9000?ns=fir-corso-9430d', // Use emulator host
 });
 
 const dbFs = getFirestore();

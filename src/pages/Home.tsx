@@ -4,7 +4,9 @@ import { useContext, useState } from 'react';
 import Chat from '../components/Chat';
 import CreatePost from '../components/CreatePost';
 import Feed from '../components/Feed';
+import NotificationSettings from '../components/NotificationSettings';
 import PresencePanel from '../components/PresencePanel';
+import ServiceWorkerDebug from '../components/ServiceWorkerDebug';
 import UploadAvatarDialog from '../components/UploadAvatarDialog'; // Importa il nuovo componente
 import { AppContext } from '../context/AppContext';
 import { auth } from '../firebase';
@@ -126,6 +128,7 @@ function Home({ onUserChangeRequest }: HomeProps) {
         <Tabs value={value} onChange={handleChange} aria-label="chat tabs" variant="fullWidth">
           <Tab label="Feed" {...a11yProps(0)} />
           <Tab label="Chat" {...a11yProps(1)} />
+          <Tab label="Impostazioni" {...a11yProps(2)} />
         </Tabs>
       </AppBar>
 
@@ -137,6 +140,10 @@ function Home({ onUserChangeRequest }: HomeProps) {
           </TabPanel>
           <TabPanel value={value} index={1}>
             <Chat />
+          </TabPanel>
+          <TabPanel value={value} index={2}>
+            <ServiceWorkerDebug />
+            <NotificationSettings userId={me?.id} />
           </TabPanel>
         </Box>
         <Box sx={{ width: 300, borderLeft: '1px solid #eee', p: 2 }}>

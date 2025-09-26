@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import UserPromptDialog from './components/UserPromptDialog';
 import { AppContext, type SnackbarSeverity } from './context/AppContext';
 import { auth, db } from './firebase';
+import { useMessaging } from './hooks/useMessaging';
 import Auth from './pages/Auth';
 import Home from './pages/Home';
 import type { User } from './types/user';
@@ -25,9 +26,16 @@ function App() {
     severity: 'info',
   });
 
+  // Inizializza Firebase Messaging
+  const { requestPermission, permission, token, error } = useMessaging({
+    userId: firebaseUser?.uid,
+  });
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setFirebaseUser(user);
+      console.log('Auth state changed, user:', user);
+
       if (user) {
         // Cerca l'utente in localStorage
         const storedUser = getMyUser(user.uid);
@@ -40,9 +48,19 @@ function App() {
           const userDocSnap = await getDoc(userDocRef);
 
           if (userDocSnap.exists()) {
-            const userData = userDocSnap.data() as User;
-            setMyUser({...userData, id: user.uid}); // Salva in localStorage
-            setMeState(userData);
+            const userData = userDocSnap.data();
+
+            // Verifica che l'utente abbia tutti i dati necessari
+            if (userData.name && userData.surname && userData.email) {
+              const completeUser = { ...userData, id: user.uid } as User;
+              setMyUser(completeUser); // Salva in localStorage
+              setMeState(completeUser);
+            } else {
+              // Il documento esiste ma non ha tutti i dati necessari
+              // (probabilmente contiene solo fcmToken)
+              console.log('User document exists but is incomplete, requesting user info');
+              setOpenUserPrompt(true);
+            }
           } else {
             // L'utente è nuovo, apri il dialogo per chiedere nome e cognome
             setOpenUserPrompt(true);
@@ -68,10 +86,15 @@ function App() {
       avatar: firebaseUser.photoURL || undefined, // Popola l'avatar se disponibile
     };
 
-    // Salva il nuovo utente in Firestore e in localStorage
-    await setDoc(doc(db, 'users', firebaseUser.uid), newUser);
-    setMyUser(newUser);
-    setMeState(newUser);
+    // Salva i dati dell'utente in Firestore preservando eventuali dati esistenti (come fcmToken)
+    await setDoc(doc(db, 'users', firebaseUser.uid), newUser, { merge: true });
+
+    // Ora leggi i dati completi dal database per includere eventuali campi esistenti
+    const updatedUserDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+    const completeUserData = { ...updatedUserDoc.data(), id: firebaseUser.uid } as User;
+
+    setMyUser(completeUserData);
+    setMeState(completeUserData);
     setOpenUserPrompt(false);
   };
 
@@ -92,6 +115,36 @@ function App() {
     }
     setSnackbar((prev) => ({ ...prev, open: false }));
   };
+
+  // Effetto per gestire gli errori di Firebase Messaging
+  useEffect(() => {
+    if (error) {
+      showSnackbar(`Notification error: ${error}`, 'error');
+    }
+  }, [error]);
+
+  // Effetto per richiedere il permesso per le notifiche quando l'utente è autenticato
+  useEffect(() => {
+    if (firebaseUser && permission === 'default') {
+      // Chiedi il permesso per le notifiche dopo un breve delay per migliorare l'UX
+      const timer = setTimeout(() => {
+        requestPermission().then((granted) => {
+          if (granted) {
+            showSnackbar('Notifiche abilitate!', 'success');
+          }
+        });
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [firebaseUser, permission, requestPermission]);
+
+  // Log del token FCM (solo per development)
+  useEffect(() => {
+    if (token && import.meta.env.DEV) {
+      console.log('FCM Token aggiornato:', token);
+    }
+  }, [token]);
 
   const appContextValue = useMemo(
     () => ({ me, setMe: setMyUser, showSnackbar }),

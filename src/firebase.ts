@@ -4,6 +4,7 @@ import { connectDatabaseEmulator, getDatabase, serverTimestamp as rtdbServerTime
 import { connectFirestoreEmulator, getFirestore, serverTimestamp as fsServerTimestamp } from 'firebase/firestore';
 import { connectFunctionsEmulator, getFunctions } from 'firebase/functions';
 import { connectStorageEmulator, getStorage } from 'firebase/storage';
+import { getMessaging } from 'firebase/messaging';
 
 export const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -12,6 +13,8 @@ export const firebaseConfig = {
   databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.appspot.com`,
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
 };
 
 const app = initializeApp(firebaseConfig);
@@ -21,6 +24,7 @@ export const dbRtdb = getDatabase(app);
 export const auth = getAuth(app);
 export const storage = getStorage(app);
 export const functions = getFunctions(app);
+export const messaging = getMessaging(app);
 
 export const serverTimestampFs = fsServerTimestamp;
 export const serverTimestampRtdb = rtdbServerTimestamp;
